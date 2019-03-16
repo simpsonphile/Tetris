@@ -8,6 +8,11 @@ export class Square {
         this.ctx = this.canvas.getContext('2d');
     }
 
+    move(aX, aY){
+        this.x += aX;
+        this.y += aY;
+    }
+
     update(newX, newY){
         this.x = newX;
         this.y = newY;

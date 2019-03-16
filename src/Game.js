@@ -1,4 +1,5 @@
 import { Square } from './Square';
+import { Figure, Stick, Block, L, J, T, Z, S } from './Figure';
 
 export class Game {
     constructor(){
@@ -8,11 +9,11 @@ export class Game {
         this.width = 10;
         this.height = 20;
         this.ctx = this.canvas.getContext('2d');
-        this.squares = [
-            new Square(1,1,'blue'),
-            new Square(2,2,'red'),
-            new Square(3,3,'green'),
-            new Square(8,19,'yellow')
+
+        this.figures = [
+
+            new Z(5,17)
+
         ];
     }
 
@@ -36,8 +37,7 @@ export class Game {
 
     draw(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-        this.squares.forEach(square => {
-            square.draw(this.scale);
-        });
+        this.figures.forEach(fig => {fig.draw(this.scale)});
+        this.figures.forEach(fig => {fig.rotate(1)});
     }
 }

@@ -2,7 +2,7 @@ import { GameLoop } from './GameLoop';
 import { Game } from './Game';
 
 const game = new Game(); 
-const gameLoop = new GameLoop(30, game);
+const gameLoop = new GameLoop(1, game);
 
 
 gameLoop.loop();
