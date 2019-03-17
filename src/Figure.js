@@ -24,6 +24,12 @@ export class Figure {
         this.r = this.r%4;
     }
 
+    move(x,y){
+        this.squares.forEach(square => {
+            square.move(x,y);
+        });
+    }
+
     draw(scale){
         this.squares.forEach(square => {
             square.draw(scale);

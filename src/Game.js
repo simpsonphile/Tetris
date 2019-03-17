@@ -1,6 +1,7 @@
 import { Square } from './Square';
 import { Figure, Stick, Block, L, J, T, Z, S } from './Figure';
 
+
 export class Game {
     constructor(){
         this.canvas = document.getElementById('game');
@@ -10,11 +11,12 @@ export class Game {
         this.height = 20;
         this.ctx = this.canvas.getContext('2d');
 
-        this.figures = [
+        this.keyMapDown = [];
 
-            new Z(5,17)
-
-        ];
+        this.currentFigure = new Z(4,0);
+        this.squares = [];
+        this.lvl = 1;
+        this.tick = 0;
     }
 
     resize(){
@@ -32,12 +34,18 @@ export class Game {
     }
 
     gameUpdate(){
+        if(this.tick%10 === 0)this.currentFigure.move(0,1);
 
+        if(this.keyMapDown[83])this.currentFigure.move(0,1);
+        else if(this.keyMapDown[68])this.currentFigure.move(1,0);
+        else if(this.keyMapDown[65])this.currentFigure.move(-1,0);
+
+        this.tick++;        
     }
 
     draw(){
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
-        this.figures.forEach(fig => {fig.draw(this.scale)});
-        this.figures.forEach(fig => {fig.rotate(1)});
+        
+        this.currentFigure.draw(this.scale);
     }
 }

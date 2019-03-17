@@ -18,6 +18,10 @@ export class Square {
         this.y = newY;
     }
 
+    checkForColision(aX, aY){
+
+    }
+
     draw(scale){
         this.ctx.beginPath();
         this.ctx.fillStyle = this.color;
