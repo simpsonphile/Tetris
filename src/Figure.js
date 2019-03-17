@@ -8,9 +8,7 @@ export class Figure {
         this.current = true;
     }
 
-    update(){
-
-    }
+    rot(rX, rY){}
 
     rotate(){
         let rX, rY;
@@ -60,8 +58,6 @@ export class Figure {
             square.draw(scale);
         });
     }
-
-    rot(rX, rY){}
 }
 
 export class Stick extends Figure {
@@ -120,15 +116,15 @@ export class J extends Figure {
         this.squares = [
             new Square(x,y,'orangered'),
             new Square(x-1,y,'orangered'),
-            new Square(x,y+1,'orangered'),
-            new Square(x,y+2,'orangered') 
+            new Square(x,y-1,'orangered'),
+            new Square(x,y-2,'orangered') 
         ];
     }
 
     rot(rX, rY){
         this.squares[1].move(1*rY, 1*rX);
-        this.squares[2].move(1*rX, -1*rY);
-        this.squares[3].move(2*rX, -2*rY); 
+        this.squares[2].move(1*rX, 1*rY);
+        this.squares[3].move(2*rX, 2*rY); 
     }
 }
 
@@ -183,7 +179,6 @@ export class S extends Figure {
     rot(rX, rY){
         this.squares[1].move(1*rY, 1*rX);
         this.squares[2].move(-1*rX, 1*rY);
-
         this.squares[3].move(-2*rX*(this.r%2?0:1), -2*rX*(this.r%2?1:0)); 
     }
 }

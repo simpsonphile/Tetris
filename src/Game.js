@@ -13,10 +13,19 @@ export class Game {
 
         this.keyMapDown = [];
 
-        this.currentFigure = new Z(4,0);
+        this.currentFigure;
         this.squares = [];
         this.lvl = 1;
+        this.points = 0;
         this.tick = 0;
+    }
+
+    init(){
+        this.squares = [];
+        this.lvl = 1;
+        this.points = 0;
+        this. tick = 0;
+        this.newFigure();
     }
 
     resize(){
@@ -42,6 +51,22 @@ export class Game {
         else if(rand === 5)this.currentFigure = new T(4,0);
         else if(rand === 6)this.currentFigure = new Z(4,0);
         else this.currentFigure = new S(4,0);
+
+        this.checkIfLost();
+    }
+
+    checkIfLost(){
+        for(let i = 0; i < 4; i++){
+            for(let j = 0; j < this.squares.length; j++){
+                if(this.currentFigure.squares[i].x === this.squares[j].x && this.currentFigure.squares[i].y === this.squares[j].y){
+                    this.gameOver();
+                }
+            }
+        }
+    }
+
+    gameOver(){
+        this.init();
     }
 
     gameUpdate(){
