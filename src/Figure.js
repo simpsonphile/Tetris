@@ -5,6 +5,7 @@ export class Figure {
         this.x = x;
         this.y = y;
         this.r = 0;
+        this.current = true;
     }
 
     update(){
@@ -24,10 +25,34 @@ export class Figure {
         this.r = this.r%4;
     }
 
-    move(x,y){
+    checkForColision(x, y, squares){
+        let colided = false;
+
         this.squares.forEach(square => {
-            square.move(x,y);
+            if(square.checkForColision(x, y, squares)){
+                colided = true;
+            }
         });
+
+        return colided;
+    }
+
+    move(x,y, squares){
+        let stopMoving = false;
+        if(y>0 && this.checkForColision(x,y, squares)){//if moving down and colided
+            stopMoving = true;
+        } else if(y>=0 && this.checkForColision(x,y, squares)){//if moving in x dir and colided
+            return false;
+        }
+
+        if(stopMoving){
+            this.current = false;
+        } else {
+            this.squares.forEach(square => {
+                square.move(x,y);
+            });
+        }
+
     }
 
     draw(scale){

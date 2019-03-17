@@ -18,9 +18,25 @@ export class Square {
         this.y = newY;
     }
 
-    checkForColision(aX, aY){
+    checkForColision(aX, aY, squares){
+        let colided = false;
 
+        const newX = this.x + aX;
+        const newY = this.y + aY;
+
+        squares.forEach(square => {
+            if(square.x == newX && square.y == newY) {
+                colided = true;
+            }
+        });
+
+        if(newX > 9) return true;
+        if(newX < 0) return true;
+        if(newY > 19) return true;
+
+        return colided;
     }
+
 
     draw(scale){
         this.ctx.beginPath();
