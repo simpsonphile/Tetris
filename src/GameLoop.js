@@ -12,12 +12,16 @@ export class GameLoop {
     this.game = game;
   }
 
+  pauseGame(){
+    this.pause = !this.pause;
+  }
+
   gameLoop(){
     requestAnimationFrame(this.gameLoop.bind(this));
     this.now = Date.now();
     this.delta = this.now - this.then;
 
-    if(this.delta > this.interval){
+    if(this.delta > this.interval && !this.pause){
         this.game.draw();
         this.then = this.now - (this.delta % this.interval);
     }  
@@ -28,7 +32,7 @@ export class GameLoop {
     this.now = Date.now();
     this.delta2 = this.now - this.then2;
 
-    if(this.delta2 > 100){
+    if(this.delta2 > 100 && !this.pause){
       this.game.gameUpdate();
       this.then2 = this.now - (this.delta2 % 100);
   } 

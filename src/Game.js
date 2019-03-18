@@ -26,6 +26,12 @@ export class Game {
         this.points = 0;
         this. tick = 0;
         this.newFigure();
+        this.updateUI();
+    }
+
+    updateUI(){
+        // document.querySelector('.game-panel__points span').innerHTML = this.points;
+        // document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
     }
 
     resize(){
@@ -42,10 +48,43 @@ export class Game {
         this.canvas.width = this.scale * this.width;
     }
 
+    checkRows(){
+        const rows = [];
+        for(let i = 0; i < this.height; i++){
+            if(this.checkRow(i))rows.push(i);
+        }
+        
+        return rows;
+    }
+
+    checkRow(y){
+        const row = [];
+        this.squares.forEach(sqr => {
+            if(sqr.y === y)row.push(sqr);
+        });
+
+        if(row.length == 10){
+           return true;
+        }
+
+        return false;
+    }
+
+    killRow(y){
+        for(let i = 0; i < this.squares.length; i++){
+            if(this.squares[i].y === y){
+                delete this.squares[i];
+                this.squares.splice(i,1);
+                i--;
+                continue;
+            }
+        }
+    }
+
     newFigure(){
         let rand = Math.floor(Math.random()*7)+1;
-        if(rand === 1)this.currentFigure = new Stick(4,0);
-        else if(rand === 2)this.currentFigure = new Block(4,0);
+        if(rand === 1)this.currentFigure = new Stick(4,-2);
+        else if(rand === 2)this.currentFigure = new Block(4,-1);
         else if(rand === 3)this.currentFigure = new L(4,0);
         else if(rand === 4)this.currentFigure = new J(4,0);
         else if(rand === 5)this.currentFigure = new T(4,0);
@@ -65,6 +104,27 @@ export class Game {
         }
     }
 
+    moveSquares(rows){
+        rows = rows.sort((a,b) => {
+            if(a < b) return -1;
+            if(a > b) return 1;
+            return 0;
+        });
+
+
+        for(let i = 0; i < rows.length; i++){//deleted row
+            for(let j = rows[i]; j >= 0; j--){//every row higher than deleted row
+                this.squares.forEach(sqr => {
+                    if(sqr.y < rows[j]){
+                        if(!sqr.checkForColision(0, 1, this.squares)){
+                            sqr.move(0, 1);
+                        }
+                    }
+                });
+            }
+        } 
+    }
+
     gameOver(){
         this.init();
     }
@@ -74,6 +134,15 @@ export class Game {
 
         if(this.currentFigure.current === false){
             this.squares = [...this.squares, ...this.currentFigure.squares];
+
+            const fullRows = this.checkRows();
+            if(fullRows.length > 0){
+                fullRows.forEach(row => {
+                    this.killRow(row);
+                });
+                this.moveSquares(Fullrows);
+            }
+
             this.newFigure();
         }
 

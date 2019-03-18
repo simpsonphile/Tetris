@@ -1,0 +1,46 @@
+* {
+    margin: 0; 
+    padding: 0;
+}
+
+#game-container {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+}
+
+#game {
+    background: black;
+}
+
+.game-panel {
+    height: 100vh;
+    padding: 20px;
+    background: #3498db;
+}
+
+.game-panel__points,
+.game-panel__lvl {
+    padding-top: 20px;
+    font-size: 24px;
+    color: white;
+}
+
+.game-panel__next-blocks {
+    padding: 30px 10px;
+}
+
+.game-panel__block {
+    padding: 5px;
+    margin: 10px;
+
+    border-radius: 8px;
+    border: 2px solid #bdc3c7;
+    
+}
+
+.game-panel__block img {
+
+}
+
