@@ -102,9 +102,9 @@ export class L extends Figure {
     }
 
     rot(rX, rY){
-        this.squares[1].move(-1*rY, -1*rX);
-        this.squares[2].move(-1*rX, 1*rY);
-        this.squares[3].move(-2*rX, 2*rY); 
+        this.squares[1].move(-1*rY, 1*rX);
+        this.squares[2].move(1*rX, 1*rY);
+        this.squares[3].move(2*rX, 2*rY); 
     }
 
     
@@ -115,14 +115,14 @@ export class J extends Figure {
         super(x, y, r);
         this.squares = [
             new Square(x,y,'orangered'),
-            new Square(x-1,y,'orangered'),
+            new Square(x-1,y,'yellow'),
             new Square(x,y-1,'orangered'),
             new Square(x,y-2,'orangered') 
         ];
     }
 
     rot(rX, rY){
-        this.squares[1].move(1*rY, 1*rX);
+        this.squares[1].move(1*rY, -1*rX);
         this.squares[2].move(1*rX, 1*rY);
         this.squares[3].move(2*rX, 2*rY); 
     }

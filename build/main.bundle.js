@@ -593,9 +593,9 @@ var L = exports.L = function (_Figure3) {
     _createClass(L, [{
         key: 'rot',
         value: function rot(rX, rY) {
-            this.squares[1].move(-1 * rY, -1 * rX);
-            this.squares[2].move(-1 * rX, 1 * rY);
-            this.squares[3].move(-2 * rX, 2 * rY);
+            this.squares[1].move(-1 * rY, 1 * rX);
+            this.squares[2].move(1 * rX, 1 * rY);
+            this.squares[3].move(2 * rX, 2 * rY);
         }
     }]);
 
@@ -610,14 +610,14 @@ var J = exports.J = function (_Figure4) {
 
         var _this4 = _possibleConstructorReturn(this, (J.__proto__ || Object.getPrototypeOf(J)).call(this, x, y, r));
 
-        _this4.squares = [new _Square.Square(x, y, 'orangered'), new _Square.Square(x - 1, y, 'orangered'), new _Square.Square(x, y - 1, 'orangered'), new _Square.Square(x, y - 2, 'orangered')];
+        _this4.squares = [new _Square.Square(x, y, 'orangered'), new _Square.Square(x - 1, y, 'yellow'), new _Square.Square(x, y - 1, 'orangered'), new _Square.Square(x, y - 2, 'orangered')];
         return _this4;
     }
 
     _createClass(J, [{
         key: 'rot',
         value: function rot(rX, rY) {
-            this.squares[1].move(1 * rY, 1 * rX);
+            this.squares[1].move(1 * rY, -1 * rX);
             this.squares[2].move(1 * rX, 1 * rY);
             this.squares[3].move(2 * rX, 2 * rY);
         }
