@@ -17,6 +17,7 @@ export class Game {
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.combo = 0;
         this.tick = 0;
     }
 
@@ -24,6 +25,7 @@ export class Game {
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.combo = 0;
         this. tick = 0;
         this.newFigure();
         this.updateUI();
@@ -107,20 +109,20 @@ export class Game {
                 continue;
             }
         }
+
+        console.log(`killed ${y}`);
     }
 
-    collapseRows(rows){
-        for(let i = 0; i < rows.length; i++){//deleted row
-            for(let j = rows[i]; j >= 0; j--){//every row higher or equal to deleted row
-                this.squares.forEach(sqr => {//for every square
-                    if(sqr.y === j){
-                        if(!sqr.checkForColision(0, 1, this.squares)){//if no colision
-                            sqr.move(0, 1);//move square down
-                        }
-                    }
-                });
-            }
-        } 
+    collapseRow(row){
+        for(let i = row; i >= 0; i--){//every row higher or equal to deleted row
+            this.squares.forEach(sqr => {//for every square
+                if(sqr.y === i){//that is equal to selected row  
+                    sqr.move(0, 1);//move down
+                }
+            });
+        }
+
+        console.log(`collapsed ${row}`);
     }
 
     gameOver(){
@@ -137,24 +139,36 @@ export class Game {
         else if(this.keyMapDown[65])this.currentFigure.move(-1,0, this.squares);
     }
 
-
+    addPoints(killedRows, combo){
+        this.points += killedRows*1000 + combo*1000;
+        console.log(this.points);
+    }
 
     gameUpdate(){
+        let killedRows = 0;
         this.gravitate();
 
         if(this.currentFigure.current === false){
-            this.squares = [...this.squares, ...this.currentFigure.squares];
+            this.squares = [...this.squares, ...this.currentFigure.squares];//add old figure to squares
             
-            const fullRows = this.checkFullRows();
-            if(fullRows.length > 0){
-                fullRows.forEach(row => {
-                    this.killFullRow(row);
+            let fullRows = this.checkFullRows();//check if we have full rows
+            if(fullRows.length > 0){//if we have full rows
+                this.combo ++;
+
+                fullRows.forEach(row => {//for every row
+                    this.killFullRow(row + killedRows);//kill row
+                    this.collapseRow(row + killedRows);//colapse 1 row down
+                    killedRows++;
                 });
-                this.collapseRows(fullRows);
+
+                this.addPoints(killedRows, this.combo);
+            } else {
+                this.combo = 0;
             }
             
             this.newFigure();
             this.checkIfLost();
+
         }
 
         this.listenEvents();
