@@ -115,7 +115,7 @@ export class J extends Figure {
         super(x, y, r);
         this.squares = [
             new Square(x,y,'orangered'),
-            new Square(x-1,y,'yellow'),
+            new Square(x-1,y,'orangered'),
             new Square(x,y-1,'orangered'),
             new Square(x,y-2,'orangered') 
         ];

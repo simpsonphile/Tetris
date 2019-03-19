@@ -48,39 +48,6 @@ export class Game {
         this.canvas.width = this.scale * this.width;
     }
 
-    checkRows(){
-        const rows = [];
-        for(let i = 0; i < this.height; i++){
-            if(this.checkRow(i))rows.push(i);
-        }
-        
-        return rows;
-    }
-
-    checkRow(y){
-        const row = [];
-        this.squares.forEach(sqr => {
-            if(sqr.y === y)row.push(sqr);
-        });
-
-        if(row.length == 10){
-           return true;
-        }
-
-        return false;
-    }
-
-    killRow(y){
-        for(let i = 0; i < this.squares.length; i++){
-            if(this.squares[i].y === y){
-                delete this.squares[i];
-                this.squares.splice(i,1);
-                i--;
-                continue;
-            }
-        }
-    }
-
     newFigure(){
         let rand = Math.floor(Math.random()*7)+1;
         if(rand === 1)this.currentFigure = new Stick(4,-2);
@@ -90,8 +57,6 @@ export class Game {
         else if(rand === 5)this.currentFigure = new T(4,0);
         else if(rand === 6)this.currentFigure = new Z(4,0);
         else this.currentFigure = new S(4,0);
-
-        this.checkIfLost();
     }
 
     checkIfLost(){
@@ -104,20 +69,53 @@ export class Game {
         }
     }
 
-    moveSquares(rows){
-        rows = rows.sort((a,b) => {
-            if(a < b) return -1;
-            if(a > b) return 1;
+    checkFullRows(){
+        let rows = [];
+        for(let i = 0; i < this.height; i++){
+            if(this.checkFullRow(i))rows.push(i);
+        }
+
+        rows = rows.sort((a,b) => {//sort them to start from bottom to top
+            if(a > b) return -1;
+            if(a < b) return 1;
             return 0;
         });
 
+        return rows;
+    }
 
+    checkFullRow(y){
+        const row = [];
+
+        this.squares.forEach(sqr => {
+            if(sqr.y === y)row.push(sqr);
+        });
+
+        if(row.length == 10){
+           return true;
+        }
+
+        return false;
+    }
+
+    killFullRow(y){
+        for(let i = 0; i < this.squares.length; i++){
+            if(this.squares[i].y === y){
+                delete this.squares[i];
+                this.squares.splice(i,1);
+                i--;
+                continue;
+            }
+        }
+    }
+
+    collapseRows(rows){
         for(let i = 0; i < rows.length; i++){//deleted row
-            for(let j = rows[i]; j >= 0; j--){//every row higher than deleted row
-                this.squares.forEach(sqr => {
-                    if(sqr.y < rows[j]){
-                        if(!sqr.checkForColision(0, 1, this.squares)){
-                            sqr.move(0, 1);
+            for(let j = rows[i]; j >= 0; j--){//every row higher or equal to deleted row
+                this.squares.forEach(sqr => {//for every square
+                    if(sqr.y === j){
+                        if(!sqr.checkForColision(0, 1, this.squares)){//if no colision
+                            sqr.move(0, 1);//move square down
                         }
                     }
                 });
@@ -129,26 +127,37 @@ export class Game {
         this.init();
     }
 
-    gameUpdate(){
+    gravitate(){
         if(this.tick%10 === 0)this.currentFigure.move(0,1, this.squares);
+    }
 
-        if(this.currentFigure.current === false){
-            this.squares = [...this.squares, ...this.currentFigure.squares];
-
-            const fullRows = this.checkRows();
-            if(fullRows.length > 0){
-                fullRows.forEach(row => {
-                    this.killRow(row);
-                });
-                this.moveSquares(Fullrows);
-            }
-
-            this.newFigure();
-        }
-
+    listenEvents(){
         if(this.keyMapDown[83])this.currentFigure.move(0,1, this.squares);
         else if(this.keyMapDown[68])this.currentFigure.move(1,0, this.squares);
         else if(this.keyMapDown[65])this.currentFigure.move(-1,0, this.squares);
+    }
+
+
+
+    gameUpdate(){
+        this.gravitate();
+
+        if(this.currentFigure.current === false){
+            this.squares = [...this.squares, ...this.currentFigure.squares];
+            
+            const fullRows = this.checkFullRows();
+            if(fullRows.length > 0){
+                fullRows.forEach(row => {
+                    this.killFullRow(row);
+                });
+                this.collapseRows(fullRows);
+            }
+            
+            this.newFigure();
+            this.checkIfLost();
+        }
+
+        this.listenEvents();
 
         this.tick++;        
     }
