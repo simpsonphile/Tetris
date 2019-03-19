@@ -161,7 +161,7 @@ export class Game {
     }
 
     addPoints(killedRows, combo){
-        this.points += killedRows*1000 + combo*1000;
+        this.points += killedRows*killedRows*1000 + combo*1000;
         console.log(this.points);
     }
 

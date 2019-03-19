@@ -163,8 +163,14 @@ document.addEventListener('keydown', function (e) {
 
 document.addEventListener('keyup', function (e) {
     game.keyMapDown[e.keyCode] = false;
-    if (e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate(game.squares);
-    if (e.keyCode === 80) gameLoop.pauseGame();
+    if (e.keyCode === 32 && !gameLoop.pause) {
+        game.currentFigure.rotate(game.squares);
+        game.sound.rotate.play();
+    }
+    if (e.keyCode === 80) {
+        gameLoop.pauseGame();
+        if (gameLoop.pause) game.sound.pauseOn.play();else game.sound.pauseOff.play();
+    }
     if (e.keyCode === 82) {
         gameLoop.pause = false;
         game.init();
@@ -278,6 +284,14 @@ var Game = exports.Game = function () {
         this.points = 0;
         this.combo = 0;
         this.tick = 0;
+
+        this.sound = {
+            rotate: new Audio('../sounds/rotate.wav'),
+            put: new Audio('../sounds/put.wav'),
+            combo: new Audio('../sounds/combo.wav'),
+            pauseOn: new Audio('../sounds/pauseon.ogg'),
+            pauseOff: new Audio('../sounds/pauseoff.ogg')
+        };
     }
 
     _createClass(Game, [{
@@ -301,6 +315,8 @@ var Game = exports.Game = function () {
             if (this.combo > 1) {
                 document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
                 document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
+
+                this.sound.combo.play();
                 setTimeout(function () {
                     document.querySelector('.game-combo-pop').classList.remove('pop');
                 }, 500);
@@ -426,7 +442,7 @@ var Game = exports.Game = function () {
     }, {
         key: 'addPoints',
         value: function addPoints(killedRows, combo) {
-            this.points += killedRows * 1000 + combo * 1000;
+            this.points += killedRows * killedRows * 1000 + combo * 1000;
             console.log(this.points);
         }
     }, {
@@ -456,6 +472,10 @@ var Game = exports.Game = function () {
                     this.combo++;
                 } else {
                     this.combo = 0;
+                }
+
+                if (this.combo < 2) {
+                    this.sound.put.play();
                 }
 
                 this.updateUI();
