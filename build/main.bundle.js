@@ -165,6 +165,7 @@ document.addEventListener('keyup', function (e) {
     game.keyMapDown[e.keyCode] = false;
     if (e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate();
     if (e.keyCode === 80) gameLoop.pauseGame();
+    if (e.keyCode === 82) game.init();
 });
 
 /***/ }),
@@ -306,48 +307,10 @@ var Game = exports.Game = function () {
             this.canvas.width = this.scale * this.width;
         }
     }, {
-        key: 'checkRows',
-        value: function checkRows() {
-            var rows = [];
-            for (var i = 0; i < this.height; i++) {
-                if (this.checkRow(i)) rows.push(i);
-            }
-
-            return rows;
-        }
-    }, {
-        key: 'checkRow',
-        value: function checkRow(y) {
-            var row = [];
-            this.squares.forEach(function (sqr) {
-                if (sqr.y === y) row.push(sqr);
-            });
-
-            if (row.length == 10) {
-                return true;
-            }
-
-            return false;
-        }
-    }, {
-        key: 'killRow',
-        value: function killRow(y) {
-            for (var i = 0; i < this.squares.length; i++) {
-                if (this.squares[i].y === y) {
-                    delete this.squares[i];
-                    this.squares.splice(i, 1);
-                    i--;
-                    continue;
-                }
-            }
-        }
-    }, {
         key: 'newFigure',
         value: function newFigure() {
             var rand = Math.floor(Math.random() * 7) + 1;
             if (rand === 1) this.currentFigure = new _Figure.Stick(4, -2);else if (rand === 2) this.currentFigure = new _Figure.Block(4, -1);else if (rand === 3) this.currentFigure = new _Figure.L(4, 0);else if (rand === 4) this.currentFigure = new _Figure.J(4, 0);else if (rand === 5) this.currentFigure = new _Figure.T(4, 0);else if (rand === 6) this.currentFigure = new _Figure.Z(4, 0);else this.currentFigure = new _Figure.S(4, 0);
-
-            this.checkIfLost();
         }
     }, {
         key: 'checkIfLost',
@@ -361,23 +324,63 @@ var Game = exports.Game = function () {
             }
         }
     }, {
-        key: 'moveSquares',
-        value: function moveSquares(rows) {
-            var _this = this;
+        key: 'checkFullRows',
+        value: function checkFullRows() {
+            var rows = [];
+            for (var i = 0; i < this.height; i++) {
+                if (this.checkFullRow(i)) rows.push(i);
+            }
 
             rows = rows.sort(function (a, b) {
-                if (a < b) return -1;
-                if (a > b) return 1;
+                //sort them to start from bottom to top
+                if (a > b) return -1;
+                if (a < b) return 1;
                 return 0;
             });
 
+            return rows;
+        }
+    }, {
+        key: 'checkFullRow',
+        value: function checkFullRow(y) {
+            var row = [];
+
+            this.squares.forEach(function (sqr) {
+                if (sqr.y === y) row.push(sqr);
+            });
+
+            if (row.length == 10) {
+                return true;
+            }
+
+            return false;
+        }
+    }, {
+        key: 'killFullRow',
+        value: function killFullRow(y) {
+            for (var i = 0; i < this.squares.length; i++) {
+                if (this.squares[i].y === y) {
+                    delete this.squares[i];
+                    this.squares.splice(i, 1);
+                    i--;
+                    continue;
+                }
+            }
+        }
+    }, {
+        key: 'collapseRows',
+        value: function collapseRows(rows) {
+            var _this = this;
+
             for (var i = 0; i < rows.length; i++) {
                 var _loop = function _loop(j) {
-                    //every row higher than deleted row
+                    //every row higher or equal to deleted row
                     _this.squares.forEach(function (sqr) {
-                        if (sqr.y < rows[j]) {
+                        //for every square
+                        if (sqr.y === j) {
                             if (!sqr.checkForColision(0, 1, _this.squares)) {
-                                sqr.move(0, 1);
+                                //if no colision
+                                sqr.move(0, 1); //move square down
                             }
                         }
                     });
@@ -395,27 +398,38 @@ var Game = exports.Game = function () {
             this.init();
         }
     }, {
+        key: 'gravitate',
+        value: function gravitate() {
+            if (this.tick % 10 === 0) this.currentFigure.move(0, 1, this.squares);
+        }
+    }, {
+        key: 'listenEvents',
+        value: function listenEvents() {
+            if (this.keyMapDown[83]) this.currentFigure.move(0, 1, this.squares);else if (this.keyMapDown[68]) this.currentFigure.move(1, 0, this.squares);else if (this.keyMapDown[65]) this.currentFigure.move(-1, 0, this.squares);
+        }
+    }, {
         key: 'gameUpdate',
         value: function gameUpdate() {
             var _this2 = this;
 
-            if (this.tick % 10 === 0) this.currentFigure.move(0, 1, this.squares);
+            this.gravitate();
 
             if (this.currentFigure.current === false) {
                 this.squares = [].concat(_toConsumableArray(this.squares), _toConsumableArray(this.currentFigure.squares));
 
-                var fullRows = this.checkRows();
+                var fullRows = this.checkFullRows();
                 if (fullRows.length > 0) {
                     fullRows.forEach(function (row) {
-                        _this2.killRow(row);
+                        _this2.killFullRow(row);
                     });
-                    this.moveSquares(Fullrows);
+                    this.collapseRows(fullRows);
                 }
 
                 this.newFigure();
+                this.checkIfLost();
             }
 
-            if (this.keyMapDown[83]) this.currentFigure.move(0, 1, this.squares);else if (this.keyMapDown[68]) this.currentFigure.move(1, 0, this.squares);else if (this.keyMapDown[65]) this.currentFigure.move(-1, 0, this.squares);
+            this.listenEvents();
 
             this.tick++;
         }
@@ -610,7 +624,7 @@ var J = exports.J = function (_Figure4) {
 
         var _this4 = _possibleConstructorReturn(this, (J.__proto__ || Object.getPrototypeOf(J)).call(this, x, y, r));
 
-        _this4.squares = [new _Square.Square(x, y, 'orangered'), new _Square.Square(x - 1, y, 'yellow'), new _Square.Square(x, y - 1, 'orangered'), new _Square.Square(x, y - 2, 'orangered')];
+        _this4.squares = [new _Square.Square(x, y, 'orangered'), new _Square.Square(x - 1, y, 'orangered'), new _Square.Square(x, y - 1, 'orangered'), new _Square.Square(x, y - 2, 'orangered')];
         return _this4;
     }
 
