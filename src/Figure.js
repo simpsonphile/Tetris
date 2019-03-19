@@ -76,10 +76,10 @@ export class Stick extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y+1,'blue'),
-            new Square(x,y,'blue'),
-            new Square(x,y+2,'blue'),
-            new Square(x,y+3,'blue')
+            new Square(x,y+1,'#0652DD'),
+            new Square(x,y,'#0652DD'),
+            new Square(x,y+2,'#0652DD'),
+            new Square(x,y+3,'#0652DD')
         ];
     }
 
@@ -94,10 +94,10 @@ export class Block extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'yellow'),
-            new Square(x+1,y,'yellow'),
-            new Square(x,y+1,'yellow'),
-            new Square(x+1,y+1,'yellow') 
+            new Square(x,y,'#FFC312'),
+            new Square(x+1,y,'#FFC312'),
+            new Square(x,y+1,'#FFC312'),
+            new Square(x+1,y+1,'#FFC312') 
         ];
     }
 }
@@ -106,10 +106,10 @@ export class L extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'violet'),
-            new Square(x+1,y,'violet'),
-            new Square(x,y-1,'violet'),
-            new Square(x,y-2,'violet') 
+            new Square(x,y,'#FDA7DF'),
+            new Square(x+1,y,'#FDA7DF'),
+            new Square(x,y-1,'#FDA7DF'),
+            new Square(x,y-2,'#FDA7DF') 
         ];
     }
 
@@ -126,10 +126,10 @@ export class J extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'orangered'),
-            new Square(x-1,y,'orangered'),
-            new Square(x,y-1,'orangered'),
-            new Square(x,y-2,'orangered') 
+            new Square(x,y,'#EA2027'),
+            new Square(x-1,y,'#EA2027'),
+            new Square(x,y-1,'#EA2027'),
+            new Square(x,y-2,'#EA2027') 
         ];
     }
 
@@ -144,10 +144,10 @@ export class T extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'lightgreen'),
-            new Square(x,y-1,'lightgreen'),
-            new Square(x+1,y,'lightgreen'),
-            new Square(x-1,y,'lightgreen') 
+            new Square(x,y,'#C4E538'),
+            new Square(x,y-1,'#C4E538'),
+            new Square(x+1,y,'#C4E538'),
+            new Square(x-1,y,'#C4E538') 
         ];
     }
 
@@ -162,10 +162,10 @@ export class Z extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'grey'),
-            new Square(x+1,y,'grey'),
-            new Square(x,y-1,'grey'),
-            new Square(x-1,y-1,'grey') 
+            new Square(x,y,'#9980FA'),
+            new Square(x+1,y,'#9980FA'),
+            new Square(x,y-1,'#9980FA'),
+            new Square(x-1,y-1,'#9980FA') 
         ];
     }
 
@@ -181,10 +181,10 @@ export class S extends Figure {
     constructor(x, y, r){
         super(x, y, r);
         this.squares = [
-            new Square(x,y,'white'),
-            new Square(x-1,y,'white'),
-            new Square(x,y-1,'white'),
-            new Square(x+1,y-1,'white') 
+            new Square(x,y,'#B53471'),
+            new Square(x-1,y,'#B53471'),
+            new Square(x,y-1,'#B53471'),
+            new Square(x+1,y-1,'#B53471') 
         ];
     }
 

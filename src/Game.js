@@ -34,6 +34,17 @@ export class Game {
     updateUI(){
         document.querySelector('.game-panel__points span').innerHTML = this.points;
         document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
+        document.querySelector('.game-panel__combo span').innerHTML = this.combo;
+
+        if(this.combo > 1){
+            document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
+            document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
+            setTimeout(function(){
+                document.querySelector('.game-combo-pop').classList.remove('pop');
+            }, 500);
+        } else {
+            document.querySelector('.game-combo-pop').classList.remove('u-flex');   
+        }
     }
 
     resize(){
@@ -154,7 +165,6 @@ export class Game {
             
             let fullRows = this.checkFullRows();//check if we have full rows
             if(fullRows.length > 0){//if we have full rows
-                this.combo ++;
 
                 fullRows.forEach(row => {//for every row
                     this.killFullRow(row + killedRows);//kill row
@@ -163,6 +173,7 @@ export class Game {
                 });
 
                 this.addPoints(killedRows, this.combo);
+                this.combo ++;
             } else {
                 this.combo = 0;
             }

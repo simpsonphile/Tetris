@@ -14,6 +14,7 @@ export class GameLoop {
 
   pauseGame(){
     this.pause = !this.pause;
+    document.querySelector('.game-pause').classList.toggle('u-flex');
   }
 
   gameLoop(){
