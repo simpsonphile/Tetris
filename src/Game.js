@@ -145,6 +145,7 @@ export class Game {
     }
 
     gameUpdate(){
+        this.listenEvents();
         let killedRows = 0;
         this.gravitate();
 
@@ -170,8 +171,6 @@ export class Game {
             this.checkIfLost();
 
         }
-
-        this.listenEvents();
 
         this.tick++;        
     }

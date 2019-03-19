@@ -13,7 +13,10 @@ export class Figure {
 
     rotate(squares){
         //save squares to back to this state in case rotation fail
-        let squaresBefore = [...this.squares];
+        let squaresBefore = [];
+        this.squares.forEach(sqr => {
+            squaresBefore.push(new Square(sqr.x, sqr.y, sqr.color));
+        });
         
         let rX, rY;
         if(this.r == 0){ rX = 1; rY = 1;}
@@ -22,38 +25,21 @@ export class Figure {
         if(this.r == 3){ rX = 1; rY = -1;}
 
         this.shadowRot(rX, rY);//rotate
-        console.log('squaresBefore', squaresBefore);
-        console.log('squaresAfter', this.squares);
 
-        if(this.checkIfColiding(squares)){//check if coliding
-            console.log('coliding');
-            console.log(this.squares);
+
+        if(this.checkForColision(0, 0, squares)){//check if coliding
             this.squares = [...squaresBefore];//back to state before
-            console.log(this.squares);
         } else {
             this.r++;
             this.r = this.r%4;
         }
     }
 
-    checkIfColiding(squares){
-        let coliding = false;
-        this.squares.forEach(figSqr => {
-            squares.forEach(sqr => {
-                if(sqr.x === figSqr.x && sqr.y === figSqr.y){
-                    coliding = true;
-                }
-            });
-        });
-
-        return coliding;
-    }
-
     checkForColision(x, y, squares){
         let colided = false;
 
-        this.squares.forEach(square => {
-            if(square.checkForColision(x, y, squares)){
+        this.squares.forEach(figSquare => {
+            if(figSquare.checkForColision(x, y, squares)){
                 colided = true;
             }
         });
