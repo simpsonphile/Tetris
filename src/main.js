@@ -22,6 +22,9 @@ document.addEventListener('keyup', e => {
     game.keyMapDown[e.keyCode] = false;
     if(e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate();
     if(e.keyCode === 80) gameLoop.pauseGame();
-    if(e.keyCode === 82) game.init();
+    if(e.keyCode === 82) {
+        gameLoop.pause = false;
+        game.init();
+    }
 });
 
