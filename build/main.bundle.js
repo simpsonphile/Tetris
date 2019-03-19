@@ -163,9 +163,12 @@ document.addEventListener('keydown', function (e) {
 
 document.addEventListener('keyup', function (e) {
     game.keyMapDown[e.keyCode] = false;
-    if (e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate();
+    if (e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate(game.squares);
     if (e.keyCode === 80) gameLoop.pauseGame();
-    if (e.keyCode === 82) game.init();
+    if (e.keyCode === 82) {
+        gameLoop.pause = false;
+        game.init();
+    }
 });
 
 /***/ }),
@@ -200,12 +203,13 @@ var GameLoop = exports.GameLoop = function () {
   }
 
   _createClass(GameLoop, [{
-    key: "pauseGame",
+    key: 'pauseGame',
     value: function pauseGame() {
       this.pause = !this.pause;
+      document.querySelector('.game-pause').classList.toggle('u-flex');
     }
   }, {
-    key: "gameLoop",
+    key: 'gameLoop',
     value: function gameLoop() {
       requestAnimationFrame(this.gameLoop.bind(this));
       this.now = Date.now();
@@ -217,7 +221,7 @@ var GameLoop = exports.GameLoop = function () {
       }
     }
   }, {
-    key: "gameLogicLoop",
+    key: 'gameLogicLoop',
     value: function gameLogicLoop() {
       requestAnimationFrame(this.gameLogicLoop.bind(this));
       this.now = Date.now();
@@ -272,6 +276,7 @@ var Game = exports.Game = function () {
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.combo = 0;
         this.tick = 0;
     }
 
@@ -281,6 +286,7 @@ var Game = exports.Game = function () {
             this.squares = [];
             this.lvl = 1;
             this.points = 0;
+            this.combo = 0;
             this.tick = 0;
             this.newFigure();
             this.updateUI();
@@ -288,8 +294,19 @@ var Game = exports.Game = function () {
     }, {
         key: 'updateUI',
         value: function updateUI() {
-            // document.querySelector('.game-panel__points span').innerHTML = this.points;
-            // document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
+            document.querySelector('.game-panel__points span').innerHTML = this.points;
+            document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
+            document.querySelector('.game-panel__combo span').innerHTML = this.combo;
+
+            if (this.combo > 1) {
+                document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
+                document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
+                setTimeout(function () {
+                    document.querySelector('.game-combo-pop').classList.remove('pop');
+                }, 500);
+            } else {
+                document.querySelector('.game-combo-pop').classList.remove('u-flex');
+            }
         }
     }, {
         key: 'resize',
@@ -366,31 +383,30 @@ var Game = exports.Game = function () {
                     continue;
                 }
             }
+
+            console.log('killed ' + y);
         }
     }, {
-        key: 'collapseRows',
-        value: function collapseRows(rows) {
+        key: 'collapseRow',
+        value: function collapseRow(row) {
             var _this = this;
 
-            for (var i = 0; i < rows.length; i++) {
-                var _loop = function _loop(j) {
-                    //every row higher or equal to deleted row
-                    _this.squares.forEach(function (sqr) {
-                        //for every square
-                        if (sqr.y === j) {
-                            if (!sqr.checkForColision(0, 1, _this.squares)) {
-                                //if no colision
-                                sqr.move(0, 1); //move square down
-                            }
-                        }
-                    });
-                };
+            var _loop = function _loop(i) {
+                //every row higher or equal to deleted row
+                _this.squares.forEach(function (sqr) {
+                    //for every square
+                    if (sqr.y === i) {
+                        //that is equal to selected row  
+                        sqr.move(0, 1); //move down
+                    }
+                });
+            };
 
-                //deleted row
-                for (var j = rows[i]; j >= 0; j--) {
-                    _loop(j);
-                }
+            for (var i = row; i >= 0; i--) {
+                _loop(i);
             }
+
+            console.log('collapsed ' + row);
         }
     }, {
         key: 'gameOver',
@@ -408,28 +424,44 @@ var Game = exports.Game = function () {
             if (this.keyMapDown[83]) this.currentFigure.move(0, 1, this.squares);else if (this.keyMapDown[68]) this.currentFigure.move(1, 0, this.squares);else if (this.keyMapDown[65]) this.currentFigure.move(-1, 0, this.squares);
         }
     }, {
+        key: 'addPoints',
+        value: function addPoints(killedRows, combo) {
+            this.points += killedRows * 1000 + combo * 1000;
+            console.log(this.points);
+        }
+    }, {
         key: 'gameUpdate',
         value: function gameUpdate() {
             var _this2 = this;
 
+            this.listenEvents();
+            var killedRows = 0;
             this.gravitate();
 
             if (this.currentFigure.current === false) {
-                this.squares = [].concat(_toConsumableArray(this.squares), _toConsumableArray(this.currentFigure.squares));
+                this.squares = [].concat(_toConsumableArray(this.squares), _toConsumableArray(this.currentFigure.squares)); //add old figure to squares
 
-                var fullRows = this.checkFullRows();
+                var fullRows = this.checkFullRows(); //check if we have full rows
                 if (fullRows.length > 0) {
+                    //if we have full rows
+
                     fullRows.forEach(function (row) {
-                        _this2.killFullRow(row);
+                        //for every row
+                        _this2.killFullRow(row + killedRows); //kill row
+                        _this2.collapseRow(row + killedRows); //colapse 1 row down
+                        killedRows++;
                     });
-                    this.collapseRows(fullRows);
+
+                    this.addPoints(killedRows, this.combo);
+                    this.combo++;
+                } else {
+                    this.combo = 0;
                 }
 
+                this.updateUI();
                 this.newFigure();
                 this.checkIfLost();
             }
-
-            this.listenEvents();
 
             this.tick++;
         }
@@ -479,15 +511,22 @@ var Figure = exports.Figure = function () {
         this.x = x;
         this.y = y;
         this.r = 0;
+        this.squares = [];
         this.current = true;
     }
 
     _createClass(Figure, [{
-        key: 'rot',
-        value: function rot(rX, rY) {}
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {}
     }, {
         key: 'rotate',
-        value: function rotate() {
+        value: function rotate(squares) {
+            //save squares to back to this state in case rotation fail
+            var squaresBefore = [];
+            this.squares.forEach(function (sqr) {
+                squaresBefore.push(new _Square.Square(sqr.x, sqr.y, sqr.color));
+            });
+
             var rX = void 0,
                 rY = void 0;
             if (this.r == 0) {
@@ -503,18 +542,24 @@ var Figure = exports.Figure = function () {
                 rX = 1;rY = -1;
             }
 
-            this.rot(rX, rY);
+            this.shadowRot(rX, rY); //rotate
 
-            this.r++;
-            this.r = this.r % 4;
+
+            if (this.checkForColision(0, 0, squares)) {
+                //check if coliding
+                this.squares = [].concat(squaresBefore); //back to state before
+            } else {
+                this.r++;
+                this.r = this.r % 4;
+            }
         }
     }, {
         key: 'checkForColision',
         value: function checkForColision(x, y, squares) {
             var colided = false;
 
-            this.squares.forEach(function (square) {
-                if (square.checkForColision(x, y, squares)) {
+            this.squares.forEach(function (figSquare) {
+                if (figSquare.checkForColision(x, y, squares)) {
                     colided = true;
                 }
             });
@@ -561,13 +606,13 @@ var Stick = exports.Stick = function (_Figure) {
 
         var _this = _possibleConstructorReturn(this, (Stick.__proto__ || Object.getPrototypeOf(Stick)).call(this, x, y, r));
 
-        _this.squares = [new _Square.Square(x, y + 1, 'blue'), new _Square.Square(x, y, 'blue'), new _Square.Square(x, y + 2, 'blue'), new _Square.Square(x, y + 3, 'blue')];
+        _this.squares = [new _Square.Square(x, y + 1, '#0652DD'), new _Square.Square(x, y, '#0652DD'), new _Square.Square(x, y + 2, '#0652DD'), new _Square.Square(x, y + 3, '#0652DD')];
         return _this;
     }
 
     _createClass(Stick, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rX, 1 * rY);
             this.squares[2].move(-1 * rX, -1 * rY);
             this.squares[3].move(-2 * rX, -2 * rY);
@@ -585,7 +630,7 @@ var Block = exports.Block = function (_Figure2) {
 
         var _this2 = _possibleConstructorReturn(this, (Block.__proto__ || Object.getPrototypeOf(Block)).call(this, x, y, r));
 
-        _this2.squares = [new _Square.Square(x, y, 'yellow'), new _Square.Square(x + 1, y, 'yellow'), new _Square.Square(x, y + 1, 'yellow'), new _Square.Square(x + 1, y + 1, 'yellow')];
+        _this2.squares = [new _Square.Square(x, y, '#FFC312'), new _Square.Square(x + 1, y, '#FFC312'), new _Square.Square(x, y + 1, '#FFC312'), new _Square.Square(x + 1, y + 1, '#FFC312')];
         return _this2;
     }
 
@@ -600,13 +645,13 @@ var L = exports.L = function (_Figure3) {
 
         var _this3 = _possibleConstructorReturn(this, (L.__proto__ || Object.getPrototypeOf(L)).call(this, x, y, r));
 
-        _this3.squares = [new _Square.Square(x, y, 'violet'), new _Square.Square(x + 1, y, 'violet'), new _Square.Square(x, y - 1, 'violet'), new _Square.Square(x, y - 2, 'violet')];
+        _this3.squares = [new _Square.Square(x, y, '#FDA7DF'), new _Square.Square(x + 1, y, '#FDA7DF'), new _Square.Square(x, y - 1, '#FDA7DF'), new _Square.Square(x, y - 2, '#FDA7DF')];
         return _this3;
     }
 
     _createClass(L, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(-1 * rY, 1 * rX);
             this.squares[2].move(1 * rX, 1 * rY);
             this.squares[3].move(2 * rX, 2 * rY);
@@ -624,13 +669,13 @@ var J = exports.J = function (_Figure4) {
 
         var _this4 = _possibleConstructorReturn(this, (J.__proto__ || Object.getPrototypeOf(J)).call(this, x, y, r));
 
-        _this4.squares = [new _Square.Square(x, y, 'orangered'), new _Square.Square(x - 1, y, 'orangered'), new _Square.Square(x, y - 1, 'orangered'), new _Square.Square(x, y - 2, 'orangered')];
+        _this4.squares = [new _Square.Square(x, y, '#EA2027'), new _Square.Square(x - 1, y, '#EA2027'), new _Square.Square(x, y - 1, '#EA2027'), new _Square.Square(x, y - 2, '#EA2027')];
         return _this4;
     }
 
     _createClass(J, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rY, -1 * rX);
             this.squares[2].move(1 * rX, 1 * rY);
             this.squares[3].move(2 * rX, 2 * rY);
@@ -648,13 +693,13 @@ var T = exports.T = function (_Figure5) {
 
         var _this5 = _possibleConstructorReturn(this, (T.__proto__ || Object.getPrototypeOf(T)).call(this, x, y, r));
 
-        _this5.squares = [new _Square.Square(x, y, 'lightgreen'), new _Square.Square(x, y - 1, 'lightgreen'), new _Square.Square(x + 1, y, 'lightgreen'), new _Square.Square(x - 1, y, 'lightgreen')];
+        _this5.squares = [new _Square.Square(x, y, '#C4E538'), new _Square.Square(x, y - 1, '#C4E538'), new _Square.Square(x + 1, y, '#C4E538'), new _Square.Square(x - 1, y, '#C4E538')];
         return _this5;
     }
 
     _createClass(T, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rX, 1 * rY);
             this.squares[2].move(-1 * rY, 1 * rX);
             this.squares[3].move(1 * rY, -1 * rX);
@@ -672,13 +717,13 @@ var Z = exports.Z = function (_Figure6) {
 
         var _this6 = _possibleConstructorReturn(this, (Z.__proto__ || Object.getPrototypeOf(Z)).call(this, x, y, r));
 
-        _this6.squares = [new _Square.Square(x, y, 'grey'), new _Square.Square(x + 1, y, 'grey'), new _Square.Square(x, y - 1, 'grey'), new _Square.Square(x - 1, y - 1, 'grey')];
+        _this6.squares = [new _Square.Square(x, y, '#9980FA'), new _Square.Square(x + 1, y, '#9980FA'), new _Square.Square(x, y - 1, '#9980FA'), new _Square.Square(x - 1, y - 1, '#9980FA')];
         return _this6;
     }
 
     _createClass(Z, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(-1 * rY, -1 * rX);
             this.squares[2].move(-1 * rX, 1 * rY);
 
@@ -697,13 +742,13 @@ var S = exports.S = function (_Figure7) {
 
         var _this7 = _possibleConstructorReturn(this, (S.__proto__ || Object.getPrototypeOf(S)).call(this, x, y, r));
 
-        _this7.squares = [new _Square.Square(x, y, 'white'), new _Square.Square(x - 1, y, 'white'), new _Square.Square(x, y - 1, 'white'), new _Square.Square(x + 1, y - 1, 'white')];
+        _this7.squares = [new _Square.Square(x, y, '#B53471'), new _Square.Square(x - 1, y, '#B53471'), new _Square.Square(x, y - 1, '#B53471'), new _Square.Square(x + 1, y - 1, '#B53471')];
         return _this7;
     }
 
     _createClass(S, [{
-        key: 'rot',
-        value: function rot(rX, rY) {
+        key: 'shadowRot',
+        value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rY, 1 * rX);
             this.squares[2].move(-1 * rX, 1 * rY);
             this.squares[3].move(-2 * rX * (this.r % 2 ? 0 : 1), -2 * rX * (this.r % 2 ? 1 : 0));
