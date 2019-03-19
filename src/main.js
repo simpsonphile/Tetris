@@ -20,8 +20,15 @@ document.addEventListener('keydown', e => {
 
 document.addEventListener('keyup', e => {
     game.keyMapDown[e.keyCode] = false;
-    if(e.keyCode === 32 && !gameLoop.pause) game.currentFigure.rotate(game.squares);
-    if(e.keyCode === 80) gameLoop.pauseGame();
+    if(e.keyCode === 32 && !gameLoop.pause) {
+        game.currentFigure.rotate(game.squares);
+        game.sound.rotate.play();
+    }
+    if(e.keyCode === 80) {
+        gameLoop.pauseGame();
+        if(gameLoop.pause)game.sound.pauseOn.play();
+        else game.sound.pauseOff.play();
+    }
     if(e.keyCode === 82) {
         gameLoop.pause = false;
         game.init();

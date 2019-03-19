@@ -19,6 +19,14 @@ export class Game {
         this.points = 0;
         this.combo = 0;
         this.tick = 0;
+
+        this.sound = {
+            rotate: new Audio('../sounds/rotate.wav'),
+            put: new Audio('../sounds/put.wav'),
+            combo: new Audio('../sounds/combo.wav'),
+            pauseOn: new Audio('../sounds/pauseon.ogg'),
+            pauseOff: new Audio('../sounds/pauseoff.ogg')
+        };    
     }
 
     init(){
@@ -39,6 +47,8 @@ export class Game {
         if(this.combo > 1){
             document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
             document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
+
+            this.sound.combo.play();
             setTimeout(function(){
                 document.querySelector('.game-combo-pop').classList.remove('pop');
             }, 500);
@@ -177,7 +187,11 @@ export class Game {
             } else {
                 this.combo = 0;
             }
-            
+
+            if(this.combo < 2){
+                this.sound.put.play();
+            }
+
             this.updateUI();
             this.newFigure();
             this.checkIfLost();
