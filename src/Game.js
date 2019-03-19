@@ -32,8 +32,8 @@ export class Game {
     }
 
     updateUI(){
-        // document.querySelector('.game-panel__points span').innerHTML = this.points;
-        // document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
+        document.querySelector('.game-panel__points span').innerHTML = this.points;
+        document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
     }
 
     resize(){
@@ -166,6 +166,7 @@ export class Game {
                 this.combo = 0;
             }
             
+            this.updateUI();
             this.newFigure();
             this.checkIfLost();
 
