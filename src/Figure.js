@@ -5,22 +5,48 @@ export class Figure {
         this.x = x;
         this.y = y;
         this.r = 0;
+        this.squares = [];
         this.current = true;
     }
 
-    rot(rX, rY){}
+    shadowRot(rX, rY){}
 
-    rotate(){
+    rotate(squares){
+        //save squares to back to this state in case rotation fail
+        let squaresBefore = [...this.squares];
+        
         let rX, rY;
         if(this.r == 0){ rX = 1; rY = 1;}
         if(this.r == 1){ rX = -1; rY = 1;}
         if(this.r == 2){ rX = -1; rY = -1;}
         if(this.r == 3){ rX = 1; rY = -1;}
 
-        this.rot(rX, rY);
-    
-        this.r++;
-        this.r = this.r%4;
+        this.shadowRot(rX, rY);//rotate
+        console.log('squaresBefore', squaresBefore);
+        console.log('squaresAfter', this.squares);
+
+        if(this.checkIfColiding(squares)){//check if coliding
+            console.log('coliding');
+            console.log(this.squares);
+            this.squares = [...squaresBefore];//back to state before
+            console.log(this.squares);
+        } else {
+            this.r++;
+            this.r = this.r%4;
+        }
+    }
+
+    checkIfColiding(squares){
+        let coliding = false;
+        this.squares.forEach(figSqr => {
+            squares.forEach(sqr => {
+                if(sqr.x === figSqr.x && sqr.y === figSqr.y){
+                    coliding = true;
+                }
+            });
+        });
+
+        return coliding;
     }
 
     checkForColision(x, y, squares){
@@ -71,7 +97,7 @@ export class Stick extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(1*rX, 1*rY);
         this.squares[2].move(-1*rX, -1*rY);
         this.squares[3].move(-2*rX, -2*rY); 
@@ -101,7 +127,7 @@ export class L extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(-1*rY, 1*rX);
         this.squares[2].move(1*rX, 1*rY);
         this.squares[3].move(2*rX, 2*rY); 
@@ -121,7 +147,7 @@ export class J extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(1*rY, -1*rX);
         this.squares[2].move(1*rX, 1*rY);
         this.squares[3].move(2*rX, 2*rY); 
@@ -139,7 +165,7 @@ export class T extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(1*rX, 1*rY);
         this.squares[2].move(-1*rY, 1*rX);
         this.squares[3].move(1*rY, -1*rX); 
@@ -157,7 +183,7 @@ export class Z extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(-1*rY, -1*rX);
         this.squares[2].move(-1*rX, 1*rY);
 
@@ -176,7 +202,7 @@ export class S extends Figure {
         ];
     }
 
-    rot(rX, rY){
+    shadowRot(rX, rY){
         this.squares[1].move(1*rY, 1*rX);
         this.squares[2].move(-1*rX, 1*rY);
         this.squares[3].move(-2*rX*(this.r%2?0:1), -2*rX*(this.r%2?1:0)); 
