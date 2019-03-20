@@ -15,23 +15,27 @@ document.addEventListener('resize', game.resize.bind(game));
 document.addEventListener('orientationchange', game.resize.bind(game));
 
 document.addEventListener('keydown', e => {
+
+    if(e.keyCode === 32 && !gameLoop.pause && !game.keyMapDown[32]) {
+        game.currentFigure.rotate(game.squares);
+        game.sound.rotate.play();
+    }
+
+    if(e.keyCode === 80 && !game.keyMapDown[80]) {
+        gameLoop.pauseGame();
+        if(gameLoop.pause)game.sound.pauseOn.play();
+        else game.sound.pauseOff.play();
+    }
+
+    if(e.keyCode === 82 && !game.keyMapDown[82]) {
+        gameLoop.pause = false;
+        game.init();
+    }
+
     game.keyMapDown[e.keyCode] = true;
 });
 
 document.addEventListener('keyup', e => {
     game.keyMapDown[e.keyCode] = false;
-    if(e.keyCode === 32 && !gameLoop.pause) {
-        game.currentFigure.rotate(game.squares);
-        game.sound.rotate.play();
-    }
-    if(e.keyCode === 80) {
-        gameLoop.pauseGame();
-        if(gameLoop.pause)game.sound.pauseOn.play();
-        else game.sound.pauseOff.play();
-    }
-    if(e.keyCode === 82) {
-        gameLoop.pause = false;
-        game.init();
-    }
 });
 

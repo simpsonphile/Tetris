@@ -156,7 +156,8 @@ export class Game {
 
     listenEvents(){
         if(this.keyMapDown[83])this.currentFigure.move(0,1, this.squares);
-        else if(this.keyMapDown[68])this.currentFigure.move(1,0, this.squares);
+        
+        if(this.keyMapDown[68])this.currentFigure.move(1,0, this.squares);
         else if(this.keyMapDown[65])this.currentFigure.move(-1,0, this.squares);
     }
 
