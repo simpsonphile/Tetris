@@ -6,26 +6,54 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 <body>
+
   <div id="game-container">
+    <div class="game-left">
+        <div class="game-left__title">HOLD</div>
+        <div class="game-left__hold"></div>
+        
+        <div class="game-left__title">NEXT</div>
+        <div class="game-left__next-blocks">
+            <div class="game-left__next-block"></div>
+            <div class="game-left__next-block"></div>
+            <div class="game-left__next-block"></div>
+            <div class="game-left__next-block"></div>
+            <div class="game-left__next-block"></div>
+        </div>
+    </div>
+
     <div class="game-canvas-container">
+      <div class="box-shadow"></div>
       <canvas id="game" width="200" height="400"></canvas>
       <div class="game-pause"></div>
       <div class="game-combo-pop">COMBO <span></span></div>
     </div>
     
      <div class="game-panel">
+       <div class="game-logo">
+         <span class="ct">T</span>
+         <span class="ce">E</span>
+         <span class="ct">T</span>
+         <span class="cr">R</span>
+         <span class="ci">I</span>
+         <span class="cs">S</span>
+       </div>
+
        <div class="game-panel__points">SCORE: <span>999999</span></div>
        
-       <div class="game-panel__lvl">LVL: <span>1</span></div>
+       <div class="game-panel__lvl">LEVEL: <span>1</span></div>
+       <div class="game-panel__rows-left">ROWS TO NEXT LEVEL: <span></span></div>
 
        <div class="game-panel__combo">COMBO: <span>0</span></div>
 
-       <div class="game-panel__next-blocks">
-          <div class="game-panel__next-block"></div>
-          <div class="game-panel__next-block"></div>
-          <div class="game-panel__next-block"></div>
-          <div class="game-panel__next-block"></div>
-          <div class="game-panel__next-block"></div>
+       <div class="game-panel__legend">
+         A, S, D<br />
+         SPACE to rotate<br />
+         C to hold
+       </div>
+
+      <div class="game-panel__copyright">
+        <p>Developed by <a href="https://simpsonphile.github.io">Dawid Mazewski</a></p>
       </div>
     </div>
 

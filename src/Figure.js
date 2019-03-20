@@ -2,8 +2,8 @@ import { Square } from './Square';
 
 export class Figure {
     constructor(x, y){
-        this.x = x;
-        this.y = y;
+        this.x = this.sX = x;
+        this.y = this.sY = y;
         this.r = 0;
         this.squares = [];
         this.current = true;
@@ -75,6 +75,14 @@ export class Figure {
 export class Stick extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "Stick";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y+1,'#0652DD'),
             new Square(x,y,'#0652DD'),
@@ -93,6 +101,14 @@ export class Stick extends Figure {
 export class Block extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "Block";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#FFC312'),
             new Square(x+1,y,'#FFC312'),
@@ -105,6 +121,14 @@ export class Block extends Figure {
 export class L extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "L";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#FDA7DF'),
             new Square(x+1,y,'#FDA7DF'),
@@ -125,6 +149,14 @@ export class L extends Figure {
 export class J extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "J";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#EA2027'),
             new Square(x-1,y,'#EA2027'),
@@ -143,6 +175,14 @@ export class J extends Figure {
 export class T extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "T";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#C4E538'),
             new Square(x,y-1,'#C4E538'),
@@ -161,6 +201,14 @@ export class T extends Figure {
 export class Z extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "Z";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#9980FA'),
             new Square(x+1,y,'#9980FA'),
@@ -180,6 +228,14 @@ export class Z extends Figure {
 export class S extends Figure {
     constructor(x, y, r){
         super(x, y, r);
+        this.name = "S";
+        this.init();
+    }
+
+    init(){
+        let x = this.x = this.sX;
+        let y = this.y = this.sY;
+        this.r = 0;
         this.squares = [
             new Square(x,y,'#B53471'),
             new Square(x-1,y,'#B53471'),

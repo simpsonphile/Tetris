@@ -165,12 +165,18 @@ document.addEventListener('keydown', function (e) {
     }
 
     if (e.keyCode === 80 && !game.keyMapDown[80]) {
-        gameLoop.pauseGame();
-        if (gameLoop.pause) game.sound.pauseOn.play();else game.sound.pauseOff.play();
+
+        if (gameLoop.pause) {
+            gameLoop.pauseGame(false);
+            game.sound.pauseOff.play();
+        } else {
+            gameLoop.pauseGame(true);
+            game.sound.pauseOn.play();
+        }
     }
 
     if (e.keyCode === 82 && !game.keyMapDown[82]) {
-        gameLoop.pause = false;
+        gameLoop.pauseGame(false);
         game.init();
     }
 
@@ -214,9 +220,14 @@ var GameLoop = exports.GameLoop = function () {
 
   _createClass(GameLoop, [{
     key: 'pauseGame',
-    value: function pauseGame() {
-      this.pause = !this.pause;
-      document.querySelector('.game-pause').classList.toggle('u-flex');
+    value: function pauseGame(state) {
+      this.pause = state;
+
+      if (state) {
+        document.querySelector('.game-pause').classList.add('u-flex');
+      } else {
+        document.querySelector('.game-pause').classList.remove('u-flex');
+      }
     }
   }, {
     key: 'gameLoop',
@@ -283,9 +294,14 @@ var Game = exports.Game = function () {
         this.keyMapDown = [];
 
         this.currentFigure;
+        this.nextFigures = [];
+        this.hold;
+        this.holded = false;
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.rows = 0;
+        this.rowsToLvl = [0, 10, 20, 35, 50, 70, 90, 120, 150, 175, 200, 250];
         this.combo = 0;
         this.tick = 0;
 
@@ -304,10 +320,34 @@ var Game = exports.Game = function () {
             this.squares = [];
             this.lvl = 1;
             this.points = 0;
+            this.rows = 0;
             this.combo = 0;
             this.tick = 0;
+
+            this.nextFigures = [];
+            for (var i = 0; i < 5; i++) {
+                this.addFigureToQue();
+            }this.hold = undefined;
+            this.holded = false;
             this.newFigure();
             this.updateUI();
+        }
+    }, {
+        key: 'resize',
+        value: function resize() {
+            var scaleOfHeight = window.innerHeight / this.height;
+            var scaleOfWidth = window.innerWidth / this.width;
+
+            if (scaleOfHeight > scaleOfWidth) {
+                this.scale = scaleOfWidth;
+            } else {
+                this.scale = scaleOfHeight;
+            }
+
+            this.scale *= 0.95;
+
+            this.canvas.height = this.scale * this.height;
+            this.canvas.width = this.scale * this.width;
         }
     }, {
         key: 'updateUI',
@@ -315,6 +355,17 @@ var Game = exports.Game = function () {
             document.querySelector('.game-panel__points span').innerHTML = this.points;
             document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
             document.querySelector('.game-panel__combo span').innerHTML = this.combo;
+            document.querySelector('.game-panel__rows-left span').innerHTML = this.rowsToLvl[this.lvl] - this.rows;
+
+            for (var i = 0; i < 5; i++) {
+                var img = '<img src="./img/' + this.nextFigures[i].name + '.png">';
+                document.querySelector('.game-left__next-block:nth-child(' + (i + 1) + ')').innerHTML = img;
+            }
+
+            if (this.hold) {
+                var _img = '<img src="./img/' + this.hold.name + '.png">';
+                document.querySelector('.game-left__hold').innerHTML = _img;
+            }
 
             if (this.combo > 1) {
                 document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
@@ -329,25 +380,50 @@ var Game = exports.Game = function () {
             }
         }
     }, {
-        key: 'resize',
-        value: function resize() {
-            var scaleOfHeight = window.innerHeight / this.height;
-            var scaleOfWidth = window.innerWidth / this.width;
+        key: 'listenEvents',
+        value: function listenEvents() {
+            if (this.keyMapDown[67]) this.holdFigure();
 
-            if (scaleOfHeight > scaleOfWidth) {
-                this.scale = scaleOfWidth;
-            } else {
-                this.scale = scaleOfHeight;
-            }
+            if (this.keyMapDown[83]) this.currentFigure.move(0, 1, this.squares);
 
-            this.canvas.height = this.scale * this.height;
-            this.canvas.width = this.scale * this.width;
+            if (this.keyMapDown[68]) this.currentFigure.move(1, 0, this.squares);else if (this.keyMapDown[65]) this.currentFigure.move(-1, 0, this.squares);
+        }
+    }, {
+        key: 'gameOver',
+        value: function gameOver() {
+            this.init();
+        }
+    }, {
+        key: 'addFigureToQue',
+        value: function addFigureToQue() {
+            var rand = Math.floor(Math.random() * 7) + 1;
+            if (rand === 1) this.nextFigures.push(new _Figure.Stick(4, -2));else if (rand === 2) this.nextFigures.push(new _Figure.Block(4, -1));else if (rand === 3) this.nextFigures.push(new _Figure.L(4, 0));else if (rand === 4) this.nextFigures.push(new _Figure.J(4, 0));else if (rand === 5) this.nextFigures.push(new _Figure.T(4, 0));else if (rand === 6) this.nextFigures.push(new _Figure.Z(4, 0));else this.nextFigures.push(new _Figure.S(4, 0));
         }
     }, {
         key: 'newFigure',
         value: function newFigure() {
-            var rand = Math.floor(Math.random() * 7) + 1;
-            if (rand === 1) this.currentFigure = new _Figure.Stick(4, -2);else if (rand === 2) this.currentFigure = new _Figure.Block(4, -1);else if (rand === 3) this.currentFigure = new _Figure.L(4, 0);else if (rand === 4) this.currentFigure = new _Figure.J(4, 0);else if (rand === 5) this.currentFigure = new _Figure.T(4, 0);else if (rand === 6) this.currentFigure = new _Figure.Z(4, 0);else this.currentFigure = new _Figure.S(4, 0);
+            this.currentFigure = this.nextFigures.shift();
+            this.addFigureToQue();
+        }
+    }, {
+        key: 'holdFigure',
+        value: function holdFigure() {
+            if (!this.holded) {
+                if (this.hold) {
+                    console.log('2');
+                    var temp = this.currentFigure;
+                    this.currentFigure = this.hold;
+                    this.hold = temp;
+                    this.hold.init();
+                } else {
+                    this.hold = this.currentFigure;
+                    this.hold.init();
+                    this.newFigure();
+                }
+            }
+
+            this.updateUI();
+            this.holded = true;
         }
     }, {
         key: 'checkIfLost',
@@ -358,6 +434,13 @@ var Game = exports.Game = function () {
                         this.gameOver();
                     }
                 }
+            }
+        }
+    }, {
+        key: 'checkIfLvlUp',
+        value: function checkIfLvlUp() {
+            if (this.rowsToLvl[this.lvl] <= this.rows) {
+                this.lvl++;
             }
         }
     }, {
@@ -403,8 +486,6 @@ var Game = exports.Game = function () {
                     continue;
                 }
             }
-
-            console.log('killed ' + y);
         }
     }, {
         key: 'collapseRow',
@@ -425,31 +506,18 @@ var Game = exports.Game = function () {
             for (var i = row; i >= 0; i--) {
                 _loop(i);
             }
-
-            console.log('collapsed ' + row);
-        }
-    }, {
-        key: 'gameOver',
-        value: function gameOver() {
-            this.init();
         }
     }, {
         key: 'gravitate',
         value: function gravitate() {
-            if (this.tick % 10 === 0) this.currentFigure.move(0, 1, this.squares);
-        }
-    }, {
-        key: 'listenEvents',
-        value: function listenEvents() {
-            if (this.keyMapDown[83]) this.currentFigure.move(0, 1, this.squares);
-
-            if (this.keyMapDown[68]) this.currentFigure.move(1, 0, this.squares);else if (this.keyMapDown[65]) this.currentFigure.move(-1, 0, this.squares);
+            if (this.tick % (12 - this.lvl) === 0 && !this.keyMapDown[83]) {
+                this.currentFigure.move(0, 1, this.squares);
+            }
         }
     }, {
         key: 'addPoints',
         value: function addPoints(killedRows, combo) {
             this.points += killedRows * killedRows * 1000 + combo * 1000;
-            console.log(this.points);
         }
     }, {
         key: 'gameUpdate',
@@ -476,6 +544,8 @@ var Game = exports.Game = function () {
 
                     this.addPoints(killedRows, this.combo);
                     this.combo++;
+                    this.rows += killedRows;
+                    this.checkIfLvlUp();
                 } else {
                     this.combo = 0;
                 }
@@ -487,6 +557,7 @@ var Game = exports.Game = function () {
                 this.updateUI();
                 this.newFigure();
                 this.checkIfLost();
+                this.holded = false;
             }
 
             this.tick++;
@@ -534,8 +605,8 @@ var Figure = exports.Figure = function () {
     function Figure(x, y) {
         _classCallCheck(this, Figure);
 
-        this.x = x;
-        this.y = y;
+        this.x = this.sX = x;
+        this.y = this.sY = y;
         this.r = 0;
         this.squares = [];
         this.current = true;
@@ -632,11 +703,20 @@ var Stick = exports.Stick = function (_Figure) {
 
         var _this = _possibleConstructorReturn(this, (Stick.__proto__ || Object.getPrototypeOf(Stick)).call(this, x, y, r));
 
-        _this.squares = [new _Square.Square(x, y + 1, '#0652DD'), new _Square.Square(x, y, '#0652DD'), new _Square.Square(x, y + 2, '#0652DD'), new _Square.Square(x, y + 3, '#0652DD')];
+        _this.name = "Stick";
+        _this.init();
         return _this;
     }
 
     _createClass(Stick, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y + 1, '#0652DD'), new _Square.Square(x, y, '#0652DD'), new _Square.Square(x, y + 2, '#0652DD'), new _Square.Square(x, y + 3, '#0652DD')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rX, 1 * rY);
@@ -656,9 +736,20 @@ var Block = exports.Block = function (_Figure2) {
 
         var _this2 = _possibleConstructorReturn(this, (Block.__proto__ || Object.getPrototypeOf(Block)).call(this, x, y, r));
 
-        _this2.squares = [new _Square.Square(x, y, '#FFC312'), new _Square.Square(x + 1, y, '#FFC312'), new _Square.Square(x, y + 1, '#FFC312'), new _Square.Square(x + 1, y + 1, '#FFC312')];
+        _this2.name = "Block";
+        _this2.init();
         return _this2;
     }
+
+    _createClass(Block, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#FFC312'), new _Square.Square(x + 1, y, '#FFC312'), new _Square.Square(x, y + 1, '#FFC312'), new _Square.Square(x + 1, y + 1, '#FFC312')];
+        }
+    }]);
 
     return Block;
 }(Figure);
@@ -671,11 +762,20 @@ var L = exports.L = function (_Figure3) {
 
         var _this3 = _possibleConstructorReturn(this, (L.__proto__ || Object.getPrototypeOf(L)).call(this, x, y, r));
 
-        _this3.squares = [new _Square.Square(x, y, '#FDA7DF'), new _Square.Square(x + 1, y, '#FDA7DF'), new _Square.Square(x, y - 1, '#FDA7DF'), new _Square.Square(x, y - 2, '#FDA7DF')];
+        _this3.name = "L";
+        _this3.init();
         return _this3;
     }
 
     _createClass(L, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#FDA7DF'), new _Square.Square(x + 1, y, '#FDA7DF'), new _Square.Square(x, y - 1, '#FDA7DF'), new _Square.Square(x, y - 2, '#FDA7DF')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(-1 * rY, 1 * rX);
@@ -695,11 +795,20 @@ var J = exports.J = function (_Figure4) {
 
         var _this4 = _possibleConstructorReturn(this, (J.__proto__ || Object.getPrototypeOf(J)).call(this, x, y, r));
 
-        _this4.squares = [new _Square.Square(x, y, '#EA2027'), new _Square.Square(x - 1, y, '#EA2027'), new _Square.Square(x, y - 1, '#EA2027'), new _Square.Square(x, y - 2, '#EA2027')];
+        _this4.name = "J";
+        _this4.init();
         return _this4;
     }
 
     _createClass(J, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#EA2027'), new _Square.Square(x - 1, y, '#EA2027'), new _Square.Square(x, y - 1, '#EA2027'), new _Square.Square(x, y - 2, '#EA2027')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rY, -1 * rX);
@@ -719,11 +828,20 @@ var T = exports.T = function (_Figure5) {
 
         var _this5 = _possibleConstructorReturn(this, (T.__proto__ || Object.getPrototypeOf(T)).call(this, x, y, r));
 
-        _this5.squares = [new _Square.Square(x, y, '#C4E538'), new _Square.Square(x, y - 1, '#C4E538'), new _Square.Square(x + 1, y, '#C4E538'), new _Square.Square(x - 1, y, '#C4E538')];
+        _this5.name = "T";
+        _this5.init();
         return _this5;
     }
 
     _createClass(T, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#C4E538'), new _Square.Square(x, y - 1, '#C4E538'), new _Square.Square(x + 1, y, '#C4E538'), new _Square.Square(x - 1, y, '#C4E538')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rX, 1 * rY);
@@ -743,11 +861,20 @@ var Z = exports.Z = function (_Figure6) {
 
         var _this6 = _possibleConstructorReturn(this, (Z.__proto__ || Object.getPrototypeOf(Z)).call(this, x, y, r));
 
-        _this6.squares = [new _Square.Square(x, y, '#9980FA'), new _Square.Square(x + 1, y, '#9980FA'), new _Square.Square(x, y - 1, '#9980FA'), new _Square.Square(x - 1, y - 1, '#9980FA')];
+        _this6.name = "Z";
+        _this6.init();
         return _this6;
     }
 
     _createClass(Z, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#9980FA'), new _Square.Square(x + 1, y, '#9980FA'), new _Square.Square(x, y - 1, '#9980FA'), new _Square.Square(x - 1, y - 1, '#9980FA')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(-1 * rY, -1 * rX);
@@ -768,11 +895,20 @@ var S = exports.S = function (_Figure7) {
 
         var _this7 = _possibleConstructorReturn(this, (S.__proto__ || Object.getPrototypeOf(S)).call(this, x, y, r));
 
-        _this7.squares = [new _Square.Square(x, y, '#B53471'), new _Square.Square(x - 1, y, '#B53471'), new _Square.Square(x, y - 1, '#B53471'), new _Square.Square(x + 1, y - 1, '#B53471')];
+        _this7.name = "S";
+        _this7.init();
         return _this7;
     }
 
     _createClass(S, [{
+        key: 'init',
+        value: function init() {
+            var x = this.x = this.sX;
+            var y = this.y = this.sY;
+            this.r = 0;
+            this.squares = [new _Square.Square(x, y, '#B53471'), new _Square.Square(x - 1, y, '#B53471'), new _Square.Square(x, y - 1, '#B53471'), new _Square.Square(x + 1, y - 1, '#B53471')];
+        }
+    }, {
         key: 'shadowRot',
         value: function shadowRot(rX, rY) {
             this.squares[1].move(1 * rY, 1 * rX);

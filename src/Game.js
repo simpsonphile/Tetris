@@ -14,9 +14,14 @@ export class Game {
         this.keyMapDown = [];
 
         this.currentFigure;
+        this.nextFigures = [];
+        this.hold;
+        this.holded = false;
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.rows = 0;
+        this.rowsToLvl = [0, 10, 20, 35, 50, 70, 90, 120, 150, 175, 200, 250];
         this.combo = 0;
         this.tick = 0;
 
@@ -33,16 +38,52 @@ export class Game {
         this.squares = [];
         this.lvl = 1;
         this.points = 0;
+        this.rows = 0;
         this.combo = 0;
         this. tick = 0;
+        
+        
+        this.nextFigures = [];
+        for(let i = 0; i < 5; i++)this.addFigureToQue();
+
+        this.hold = undefined;
+        this.holded = false;
         this.newFigure();
         this.updateUI();
+    }
+
+    resize(){
+        const scaleOfHeight = window.innerHeight/this.height;
+        const scaleOfWidth = window.innerWidth/this.width;
+    
+        if(scaleOfHeight>scaleOfWidth){
+          this.scale = scaleOfWidth;
+        } else {
+          this.scale = scaleOfHeight;
+        }
+
+        this.scale *= 0.95;
+    
+        this.canvas.height = this.scale * this.height;
+        this.canvas.width = this.scale * this.width;
     }
 
     updateUI(){
         document.querySelector('.game-panel__points span').innerHTML = this.points;
         document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
         document.querySelector('.game-panel__combo span').innerHTML = this.combo;
+        document.querySelector('.game-panel__rows-left span').innerHTML 
+        = this.rowsToLvl[this.lvl] - this.rows;
+
+        for(let i = 0; i < 5; i++){
+            const img = `<img src="./img/${this.nextFigures[i].name}.png">`;
+            document.querySelector(`.game-left__next-block:nth-child(${i+1})`).innerHTML = img;
+        }
+
+        if(this.hold){
+            const img = `<img src="./img/${this.hold.name}.png">`;
+            document.querySelector(`.game-left__hold`).innerHTML = img;
+        }
 
         if(this.combo > 1){
             document.querySelector('.game-combo-pop span').innerHTML = " " + this.combo;
@@ -57,29 +98,53 @@ export class Game {
         }
     }
 
-    resize(){
-        const scaleOfHeight = window.innerHeight/this.height;
-        const scaleOfWidth = window.innerWidth/this.width;
-    
-        if(scaleOfHeight>scaleOfWidth){
-          this.scale = scaleOfWidth;
-        } else {
-          this.scale = scaleOfHeight;
-        }
-    
-        this.canvas.height = this.scale * this.height;
-        this.canvas.width = this.scale * this.width;
+    listenEvents(){
+        if(this.keyMapDown[67])this.holdFigure();
+
+        if(this.keyMapDown[83])this.currentFigure.move(0,1, this.squares);
+
+        if(this.keyMapDown[68])this.currentFigure.move(1,0, this.squares);
+        else if(this.keyMapDown[65])this.currentFigure.move(-1,0, this.squares);
+    }
+
+    gameOver(){
+        this.init();
+    }
+
+    addFigureToQue(){
+        let rand = Math.floor(Math.random()*7)+1;
+        if(rand === 1)this.nextFigures.push(new Stick(4,-2));
+        else if(rand === 2)this.nextFigures.push(new Block(4,-1));
+        else if(rand === 3)this.nextFigures.push(new L(4,0));
+        else if(rand === 4)this.nextFigures.push(new J(4,0));
+        else if(rand === 5)this.nextFigures.push(new T(4,0));
+        else if(rand === 6)this.nextFigures.push(new Z(4,0));
+        else this.nextFigures.push(new S(4,0));
     }
 
     newFigure(){
-        let rand = Math.floor(Math.random()*7)+1;
-        if(rand === 1)this.currentFigure = new Stick(4,-2);
-        else if(rand === 2)this.currentFigure = new Block(4,-1);
-        else if(rand === 3)this.currentFigure = new L(4,0);
-        else if(rand === 4)this.currentFigure = new J(4,0);
-        else if(rand === 5)this.currentFigure = new T(4,0);
-        else if(rand === 6)this.currentFigure = new Z(4,0);
-        else this.currentFigure = new S(4,0);
+        this.currentFigure = this.nextFigures.shift();
+        this.addFigureToQue();
+    }
+
+    holdFigure(){
+        if(!this.holded){
+            if(this.hold){
+                console.log('2');
+                const temp = this.currentFigure;
+                this.currentFigure = this.hold;
+                this.hold = temp;
+                this.hold.init();
+
+            } else {
+                this.hold = this.currentFigure;
+                this.hold.init();
+                this.newFigure();
+            }
+        }
+
+        this.updateUI();
+        this.holded = true;
     }
 
     checkIfLost(){
@@ -89,6 +154,12 @@ export class Game {
                     this.gameOver();
                 }
             }
+        }
+    }
+
+    checkIfLvlUp(){
+        if(this.rowsToLvl[this.lvl] <= this.rows){
+            this.lvl++;
         }
     }
 
@@ -130,8 +201,6 @@ export class Game {
                 continue;
             }
         }
-
-        console.log(`killed ${y}`);
     }
 
     collapseRow(row){
@@ -142,28 +211,16 @@ export class Game {
                 }
             });
         }
-
-        console.log(`collapsed ${row}`);
-    }
-
-    gameOver(){
-        this.init();
     }
 
     gravitate(){
-        if(this.tick%10 === 0)this.currentFigure.move(0,1, this.squares);
-    }
-
-    listenEvents(){
-        if(this.keyMapDown[83])this.currentFigure.move(0,1, this.squares);
-        
-        if(this.keyMapDown[68])this.currentFigure.move(1,0, this.squares);
-        else if(this.keyMapDown[65])this.currentFigure.move(-1,0, this.squares);
+        if((this.tick % (12 - this.lvl)) === 0 && !this.keyMapDown[83]){
+            this.currentFigure.move(0,1, this.squares);
+        }
     }
 
     addPoints(killedRows, combo){
         this.points += killedRows*killedRows*1000 + combo*1000;
-        console.log(this.points);
     }
 
     gameUpdate(){
@@ -185,6 +242,8 @@ export class Game {
 
                 this.addPoints(killedRows, this.combo);
                 this.combo ++;
+                this.rows += killedRows;
+                this.checkIfLvlUp();
             } else {
                 this.combo = 0;
             }
@@ -196,7 +255,7 @@ export class Game {
             this.updateUI();
             this.newFigure();
             this.checkIfLost();
-
+            this.holded = false;
         }
 
         this.tick++;        
