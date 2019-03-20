@@ -22,13 +22,18 @@ document.addEventListener('keydown', e => {
     }
 
     if(e.keyCode === 80 && !game.keyMapDown[80]) {
-        gameLoop.pauseGame();
-        if(gameLoop.pause)game.sound.pauseOn.play();
-        else game.sound.pauseOff.play();
+
+        if(gameLoop.pause){
+            gameLoop.pauseGame(false);
+            game.sound.pauseOff.play();
+        } else {
+            gameLoop.pauseGame(true);
+            game.sound.pauseOn.play();
+        }
     }
 
     if(e.keyCode === 82 && !game.keyMapDown[82]) {
-        gameLoop.pause = false;
+        gameLoop.pauseGame(false);
         game.init();
     }
 

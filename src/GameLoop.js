@@ -12,9 +12,14 @@ export class GameLoop {
     this.game = game;
   }
 
-  pauseGame(){
-    this.pause = !this.pause;
-    document.querySelector('.game-pause').classList.toggle('u-flex');
+  pauseGame(state){
+    this.pause = state;
+
+    if(state){
+      document.querySelector('.game-pause').classList.add('u-flex');
+    } else {
+      document.querySelector('.game-pause').classList.remove('u-flex');
+    }
   }
 
   gameLoop(){
