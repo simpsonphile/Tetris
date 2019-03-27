@@ -2,45 +2,42 @@ import { GameLoop } from './GameLoop';
 import { Game } from './Game';
 
 
-const game = new Game(); 
+const game = new Game();
 const gameLoop = new GameLoop(30, game);
 
 game.init();
 gameLoop.gameLoop();
 gameLoop.gameLogicLoop();
 
-//EVENT LISTENERS
+// EVENT LISTENERS
 document.addEventListener('DOMContentLoaded', game.resize.bind(game));
 document.addEventListener('resize', game.resize.bind(game));
 document.addEventListener('orientationchange', game.resize.bind(game));
 
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', (e) => {
+  if (e.keyCode === 32 && !gameLoop.pause && !game.keyMapDown[32]) {
+    game.currentFigure.rotate(game.squares);
+    game.sound.rotate.play();
+  }
 
-    if(e.keyCode === 32 && !gameLoop.pause && !game.keyMapDown[32]) {
-        game.currentFigure.rotate(game.squares);
-        game.sound.rotate.play();
+  if (e.keyCode === 80 && !game.keyMapDown[80]) {
+    if (gameLoop.pause) {
+      gameLoop.pauseGame(false);
+      game.sound.pauseOff.play();
+    } else {
+      gameLoop.pauseGame(true);
+      game.sound.pauseOn.play();
     }
+  }
 
-    if(e.keyCode === 80 && !game.keyMapDown[80]) {
+  if (e.keyCode === 82 && !game.keyMapDown[82]) {
+    gameLoop.pauseGame(false);
+    game.init();
+  }
 
-        if(gameLoop.pause){
-            gameLoop.pauseGame(false);
-            game.sound.pauseOff.play();
-        } else {
-            gameLoop.pauseGame(true);
-            game.sound.pauseOn.play();
-        }
-    }
-
-    if(e.keyCode === 82 && !game.keyMapDown[82]) {
-        gameLoop.pauseGame(false);
-        game.init();
-    }
-
-    game.keyMapDown[e.keyCode] = true;
+  game.keyMapDown[e.keyCode] = true;
 });
 
-document.addEventListener('keyup', e => {
-    game.keyMapDown[e.keyCode] = false;
+document.addEventListener('keyup', (e) => {
+  game.keyMapDown[e.keyCode] = false;
 });
-
