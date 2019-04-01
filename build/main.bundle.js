@@ -462,8 +462,8 @@ var Game = exports.Game = function () {
           this.combo = 0;
         }
 
-        this.updateUI();
         this.newFigure();
+        this.updateUI();
         this.checkIfLost();
         this.holded = false;
       }

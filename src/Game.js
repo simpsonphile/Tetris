@@ -236,8 +236,8 @@ export class Game {
         this.combo = 0;
       }
 
-      this.updateUI();
       this.newFigure();
+      this.updateUI();
       this.checkIfLost();
       this.holded = false;
     }
