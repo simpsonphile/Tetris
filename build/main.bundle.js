@@ -226,6 +226,7 @@ var Game = exports.Game = function () {
     this.rows = 0;
     this.rowsToLvl = [0, 10, 20, 35, 50, 70, 90, 120, 150, 175, 200, 250];
     this.combo = 0;
+    this.showCombo = false;
     this.tick = 0;
   }
 
@@ -237,6 +238,7 @@ var Game = exports.Game = function () {
       this.points = 0;
       this.rows = 0;
       this.combo = 0;
+      this.showCombo = false;
       this.tick = 0;
 
       this.nextFigures = [];
@@ -282,15 +284,18 @@ var Game = exports.Game = function () {
         document.querySelector('.game-left__hold').innerHTML = _img;
       }
 
-      if (this.combo > 1) {
+      if (this.combo > 1 && this.showCombo) {
         document.querySelector('.game-combo-pop span').innerHTML = ' ' + this.combo;
         document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
 
         setTimeout(function () {
           document.querySelector('.game-combo-pop').classList.remove('pop');
         }, 500);
+
+        this.showCombo = false;
       } else {
         document.querySelector('.game-combo-pop').classList.remove('u-flex');
+        this.showCombo = false;
       }
     }
   }, {
@@ -456,6 +461,7 @@ var Game = exports.Game = function () {
 
           this.addPoints(killedRows, this.combo);
           this.combo += 1;
+          this.showCombo = true;
           this.rows += killedRows;
           this.checkIfLvlUp();
         } else {
