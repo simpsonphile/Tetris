@@ -3,7 +3,6 @@ import {
   Stick, Block, L, J, T, Z, S,
 } from './Figure';
 
-
 export class Game {
   constructor() {
     this.canvas = document.getElementById('game');
@@ -26,14 +25,6 @@ export class Game {
     this.rowsToLvl = [0, 10, 20, 35, 50, 70, 90, 120, 150, 175, 200, 250];
     this.combo = 0;
     this.tick = 0;
-
-    this.sound = {
-      rotate: new Audio('../sounds/rotate.wav'),
-      put: new Audio('../sounds/put.wav'),
-      combo: new Audio('../sounds/combo.wav'),
-      pauseOn: new Audio('../sounds/pauseon.ogg'),
-      pauseOff: new Audio('../sounds/pauseoff.ogg'),
-    };
   }
 
   init() {
@@ -43,7 +34,6 @@ export class Game {
     this.rows = 0;
     this.combo = 0;
     this.tick = 0;
-
 
     this.nextFigures = [];
     for (let i = 0; i < 5; i += 1) this.addFigureToQue();
@@ -90,7 +80,6 @@ export class Game {
       document.querySelector('.game-combo-pop span').innerHTML = ` ${this.combo}`;
       document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
 
-      this.sound.combo.play();
       setTimeout(() => {
         document.querySelector('.game-combo-pop').classList.remove('pop');
       }, 500);
@@ -245,10 +234,6 @@ export class Game {
         this.checkIfLvlUp();
       } else {
         this.combo = 0;
-      }
-
-      if (this.combo < 2) {
-        this.sound.put.play();
       }
 
       this.updateUI();

@@ -17,16 +17,13 @@ document.addEventListener('orientationchange', game.resize.bind(game));
 document.addEventListener('keydown', (e) => {
   if (e.keyCode === 32 && !gameLoop.pause && !game.keyMapDown[32]) {
     game.currentFigure.rotate(game.squares);
-    game.sound.rotate.play();
   }
 
   if (e.keyCode === 80 && !game.keyMapDown[80]) {
     if (gameLoop.pause) {
       gameLoop.pauseGame(false);
-      game.sound.pauseOff.play();
     } else {
       gameLoop.pauseGame(true);
-      game.sound.pauseOn.play();
     }
   }
 
