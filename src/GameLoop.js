@@ -16,9 +16,9 @@ export class GameLoop {
     this.pause = state;
 
     if (state) {
-      document.querySelector('.game-pause').classList.add('u-flex');
+      document.querySelector('.js-pause').classList.add('is-active');
     } else {
-      document.querySelector('.game-pause').classList.remove('u-flex');
+      document.querySelector('.js-pause').classList.remove('is-active');
     }
   }
 

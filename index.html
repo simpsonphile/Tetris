@@ -4,62 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="app.css">
 </head>
 <body>
-
-  <div id="game-container">
-    <div class="game-left">
-        <div class="game-left__title">HOLD</div>
-        <div class="game-left__hold"></div>
+  <div class="l-app">
+    <div class="c-space">
+        <h3 class="c-title">HOLD</h3>
+        <div class="c-box c-box--figure u-mar-bot-4 js-hold"></div>      
         
-        <div class="game-left__title">NEXT</div>
-        <div class="game-left__next-blocks">
-            <div class="game-left__next-block"></div>
-            <div class="game-left__next-block"></div>
-            <div class="game-left__next-block"></div>
-            <div class="game-left__next-block"></div>
-            <div class="game-left__next-block"></div>
+        <h3 class="c-title">NEXT</h3>
+        <div class="c-box-list">
+            <div class="c-box c-box--figure js-figure"></div>
+            <div class="c-box c-box--figure js-figure"></div>
+            <div class="c-box c-box--figure js-figure"></div>
+            <div class="c-box c-box--figure js-figure"></div>
+            <div class="c-box c-box--figure js-figure"></div>
         </div>
     </div>
 
-    <div class="game-canvas-container">
-      <div class="box-shadow"></div>
-      <canvas id="game" width="200" height="400"></canvas>
-      <div class="game-pause"></div>
-      <div class="game-combo-pop">COMBO <span></span></div>
+    <div class="c-space">
+        <div class="l-canvas-container">
+            <div class="box-shadow"></div>
+            
+            <canvas id="game" class="c-canvas"></canvas>
+
+            <div class="c-pop js-pause">PAUSE</div>
+
+            <div class="c-pop js-combo">
+                COMBO <span class="js-combo-count"></span>
+            </div>
+        </div>
     </div>
+
+    <div class="c-space c-box-list">
+        <h3 class="c-title">STATS</h3>
+
+        <div class="c-box">
+          <div class="c-box__content">
+               SCORE: <strong class="js-score">999999</strong>
+          </div>
+          
+          <div class="c-box__content">
+              LEVEL: <strong class="js-lvl">1</strong>
+           </div>
     
-     <div class="game-panel">
-       <div class="game-logo">
-         <span class="ct">T</span>
-         <span class="ce">E</span>
-         <span class="ct">T</span>
-         <span class="cr">R</span>
-         <span class="ci">I</span>
-         <span class="cs">S</span>
+          <div class="c-box__content">
+              ROWS TO NEXT LEVEL: <strong class="js-rows"></strong>
+           </div>
+    
+          <div class="c-box__content">
+              COMBO: <strong class="js-combo">0</strong>
+           </div>
        </div>
 
-       <div class="game-panel__points">SCORE: <span>999999</span></div>
-       
-       <div class="game-panel__lvl">LEVEL: <span>1</span></div>
-       <div class="game-panel__rows-left">ROWS TO NEXT LEVEL: <span></span></div>
+       <h3 class="c-title">MANUAL</h3>
 
-       <div class="game-panel__combo">COMBO: <span>0</span></div>
-
-       <div class="game-panel__legend">
-         A, S, D<br />
-         SPACE to rotate<br />
-         C to hold<br />
-         P to pause
-       </div>
-
-      <div class="game-panel__copyright">
-        <p>Developed by <a href="https://simpsonphile.github.io">Dawid Mazewski</a></p>
-      </div>
-    </div>
-
+       <div class="c-box">
+           <p>Move: A S D</p>
+           <p>Rotate: Space</p>
+           <p>Hold: C</p>
+           <p>Pause: P</p>
+        </div>
+    </div> 
   </div>
+
   <script src="./build/main.bundle.js" charset="utf-8"></script>
-  <link rel="stylesheet" href="app.css">
 </body>
 </html>

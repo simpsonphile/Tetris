@@ -6,7 +6,6 @@ import {
 export class Game {
   constructor() {
     this.canvas = document.getElementById('game');
-    this.canvasContainer = document.getElementById('game-contrainer');
 
     this.width = 10;
     this.height = 20;
@@ -63,33 +62,29 @@ export class Game {
   }
 
   updateUI() {
-    document.querySelector('.game-panel__points span').innerHTML = this.points;
-    document.querySelector('.game-panel__lvl span').innerHTML = this.lvl;
-    document.querySelector('.game-panel__combo span').innerHTML = this.combo;
-    document.querySelector('.game-panel__rows-left span').innerHTML = this.rowsToLvl[this.lvl] - this.rows;
+    document.querySelector('.js-score').innerHTML = this.points;
+    document.querySelector('.js-lvl').innerHTML = this.lvl;
+    document.querySelector('.js-combo-count').innerHTML = this.combo;
+    document.querySelector('.js-rows').innerHTML = this.rowsToLvl[this.lvl] - this.rows;
 
     for (let i = 0; i < 5; i += 1) {
       const img = `<img src="./img/${this.nextFigures[i].name}.png">`;
-      document.querySelector(`.game-left__next-block:nth-child(${i + 1})`).innerHTML = img;
+      document.querySelector(`.js-figure:nth-child(${i + 1})`).innerHTML = img;
     }
 
     if (this.hold) {
       const img = `<img src="./img/${this.hold.name}.png">`;
-      document.querySelector('.game-left__hold').innerHTML = img;
+      document.querySelector('.js-hold').innerHTML = img;
     }
 
     if (this.combo > 1 && this.showCombo) {
-      document.querySelector('.game-combo-pop span').innerHTML = ` ${this.combo}`;
-      document.querySelector('.game-combo-pop').classList.add('pop', 'u-flex');
-
+      document.querySelector('.js-combo-countsd dd').innerHTML = ` ${this.combo}`;
+      document.querySelector('.js-combo').classList.add('is-active');
+  
       setTimeout(() => {
-        document.querySelector('.game-combo-pop').classList.remove('pop');
+        document.querySelector('.js-combo').classList.remove('is-active');
+        this.showCombo = false;
       }, 500);
-
-      this.showCombo = false;
-    } else {
-      document.querySelector('.game-combo-pop').classList.remove('u-flex');
-      this.showCombo = false;
     }
   }
 
